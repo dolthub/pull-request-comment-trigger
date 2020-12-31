@@ -1,27 +1,16 @@
 {
-  "name": "pull-request-comment-trigger",
-  "version": "1.0.0",
+  "name": "pr-comment-trigger",
+  "version": "0.1.0",
   "description": "",
-  "main": "dist/index.js",
-  "scripts": {
-    "dist": "npx -p @zeit/ncc ncc build index.js",
-    "format": "prettier --write '*.js' --tab-width=4"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jaredly/actions-testbed.git"
-  },
+  "main": "index.js",
   "keywords": [],
-  "author": "",
+  "author": "dolthub",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/jaredly/actions-testbed/issues"
+  "scripts": {
+    "build": "ncc build index.js"
   },
-  "homepage": "https://github.com/jaredly/actions-testbed#readme",
   "dependencies": {
-    "@actions/core": "^1.2.0",
-    "@actions/github": "^1.1.0",
-    "prettier": "^1.19.1",
-    "prettier-cli": "^0.1.0"
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0"
   }
 }
