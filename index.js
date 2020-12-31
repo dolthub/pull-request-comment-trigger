@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
 const core = require("@actions/core");
-const { context, GitHub } = require("@actions/github");
+const github = require("@actions/github");
+
+const context = github.context;
 
 async function run() {
     const trigger = core.getInput("trigger", { required: true });
@@ -17,7 +19,10 @@ async function run() {
         context.eventName === "issue_comment"
             ? context.payload.comment.body
             : context.payload.pull_request.body;
-    core.setOutput('comment_body', body);
+
+    // handle cases by forcing body to lowercase
+    const lowered = body.toLowerCase();
+    core.setOutput('comment_body', lowered);
 
     if (
         context.eventName === "issue_comment" &&
@@ -30,9 +35,8 @@ async function run() {
 
     const { owner, repo } = context.repo;
 
-
     const prefixOnly = core.getInput("prefix_only") === 'true';
-    if ((prefixOnly && !body.startsWith(trigger)) || !body.includes(trigger)) {
+    if ((prefixOnly && !lowered.startsWith(trigger)) || !lowered.includes(trigger)) {
         core.setOutput("triggered", "false");
         return;
     }
@@ -43,7 +47,7 @@ async function run() {
         return;
     }
 
-    const client = new GitHub(GITHUB_TOKEN);
+    const client = github.getOctokit(GITHUB_TOKEN);
     if (context.eventName === "issue_comment") {
         await client.reactions.createForIssueComment({
             owner,
