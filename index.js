@@ -9,7 +9,7 @@ async function run() {
     const trigger = core.getInput("trigger", { required: true });
 
     const reaction = core.getInput("reaction");
-    const { GITHUB_TOKEN, GITHUB_RUN_ID, ACTOR } = process.env;
+    const { GITHUB_TOKEN, GITHUB_RUN_ID } = process.env;
     if (reaction && !GITHUB_TOKEN) {
         core.setFailed('If "reaction" is supplied, GITHUB_TOKEN is required');
         return;
@@ -43,20 +43,21 @@ async function run() {
 
     core.setOutput("triggered", "true");
 
-    const workflowLink = `https://github.com/${repo}/actions/runs/${GITHUB_RUN_ID}`
+    const client = github.getOctokit(GITHUB_TOKEN);
+    const workflowLink = `https://github.com/${owner}/${repo}/actions/runs/${GITHUB_RUN_ID}`
     const issueNumber = context.eventName === "issue_comment" ? context.issue.number : context.payload.pull_request.number;
+
     await client.issues.createComment({
         issue_number: issueNumber,
         repo,
         owner,
-        body: `@${ACTOR} workflow run: ${workflowLink}`,
+        body: `@${context.actor} workflow run: ${workflowLink}`,
     });
 
     if (!reaction) {
         return;
     }
 
-    const client = github.getOctokit(GITHUB_TOKEN);
     if (context.eventName === "issue_comment") {
         await client.reactions.createForIssueComment({
             owner,
